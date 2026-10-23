@@ -26,11 +26,21 @@ Press **I** while playing to see the decoder (`d3d11va` means the GPU), whether 
 | Page Up / Page Down | Previous / next file |
 | F6 or L | Show / hide playlist |
 | A / S | Cycle audio / subtitle track |
+| E | Audio window (equalizer, decoders, output) |
+| [ / ] | Audio delay −/+ 50 ms |
 | D | Deinterlace: auto → always → off |
 | H | Hardware decoding on / off |
 | . / , | Step one frame forward / back |
 | I / Tab | Media info / statistics |
 | Ctrl+O, Ctrl+Shift+O | Open file / open folder |
+
+## Audio
+
+Press **E** (or Audio button → Equalizer…) to open the audio window:
+
+- **Equalizer:** 10 bands from 31 Hz to 16 kHz, ±12 dB each, plus a preamp. Changes apply live while you listen. Comes with built-in presets (Bass boost, Dialogue, Loudness and more); save your own with *Save as…*. A limiter stops boosted bands from clipping. *Night mode* compresses loud scenes so dialogue stays audible at low volume.
+- **Decoders:** choose which decoder handles each format, like PotPlayer's built-in audio codec settings (e.g. AC-3 with `ac3` or `ac3_fixed`, MPEG Layer II with `mp2` or `mp2float`). Tick *Passthrough* to send Dolby/DTS untouched to an AV receiver over HDMI or S/PDIF. The status line shows which decoder is actually in use.
+- **Output:** audio device, channel layout (automatic, stereo downmix, 5.1, 7.1), WASAPI exclusive mode, and audio delay for out-of-sync recordings.
 
 Right-click the video for track menus, deinterlace options and low-power rendering (cheaper scalers for weak integrated GPUs). Files resume where you left off, and the last playlist comes back on the next launch.
 

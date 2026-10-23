@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include <QVariant>
 
 #include <mpv/client.h>
 
@@ -36,12 +37,16 @@ public:
 
     void loadFile(const QString &path, double startAt = 0);
     void command(const QStringList &args);
+    // Blocking variant for when the caller needs to know whether mpv accepted it.
+    bool commandSync(const QStringList &args);
     void setPaused(bool paused);
     void setVolume(double volume);
     void seekTo(double seconds, bool exact);
     void showText(const QString &text, int durationMs = 2000);
 
     QString propertyString(const char *name) const;
+    // Structured properties (lists, maps) converted to QVariantList / QVariantMap.
+    QVariant propertyValue(const char *name) const;
     void setPropertyString(const char *name, const QString &value);
 
     double position() const { return m_position; }

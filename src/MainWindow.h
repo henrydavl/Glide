@@ -6,6 +6,8 @@
 #include <QTimer>
 #include <QWidget>
 
+class AudioDialog;
+class AudioEngine;
 class ControlBar;
 class DurationProber;
 class MpvPlayer;
@@ -58,6 +60,8 @@ private:
     void fillVideoMenu(QMenu *menu);
     void showQuickInfo();
     void toggleStats();
+    void showAudioDialog(int tab);
+    void selectAudioTrack(const QString &id);
     void setLowPower(bool on);
 
     void openFileDialog();
@@ -71,6 +75,8 @@ private:
     PlaylistPanel *m_playlist;
     ControlBar *m_controls;
     DurationProber *m_prober;
+    AudioEngine *m_audio;
+    AudioDialog *m_audioDialog = nullptr;
     QSplitter *m_splitter = nullptr;
 
     QTimer m_resumeTimer;

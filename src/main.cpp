@@ -119,6 +119,26 @@ void applyTheme(QApplication &app)
         #Playlist QHeaderView::section { background: #18181c; color: #6a6a72; border: none;
                                          border-bottom: 1px solid #2a2a30; padding: 4px; }
 
+        #AudioDialog { background: #18181c; }
+        QTabWidget::pane { border: 1px solid #2a2a30; border-radius: 4px; top: -1px; padding: 8px; }
+        QTabBar::tab { background: transparent; color: #8a8a92; padding: 6px 14px; border: none;
+                       border-bottom: 2px solid transparent; }
+        QTabBar::tab:selected { color: #ffffff; border-bottom-color: #4aa3ff; }
+        QTabBar::tab:hover { color: #d8d8dc; }
+        QSlider#Band::groove:vertical { width: 4px; background: #3a3a42; border-radius: 2px; }
+        QSlider#Band::add-page:vertical { background: #4aa3ff; width: 4px; border-radius: 2px; }
+        QSlider#Band::handle:vertical { background: #ffffff; height: 12px; margin: 0 -5px; border-radius: 6px; }
+        QSlider#Band:disabled::add-page:vertical { background: #3a3a42; }
+        QCheckBox { spacing: 8px; }
+        QCheckBox::indicator { width: 14px; height: 14px; border: 1px solid #5a5a63; border-radius: 3px;
+                               background: #222228; }
+        QCheckBox::indicator:hover { border-color: #4aa3ff; }
+        QCheckBox::indicator:checked { background: #4aa3ff; border-color: #4aa3ff;
+                                       image: url(:/assets/check.png); }
+        #BandLabel { color: #8a8a92; font-size: 11px; }
+        #Note { color: #77777f; font-size: 11px; }
+        #AudioStatus { color: #d8d8dc; background: #222228; border-radius: 4px; padding: 8px; }
+
         QSplitter::handle { background: #2a2a30; }
         QScrollBar:vertical { background: transparent; width: 10px; margin: 0; }
         QScrollBar::handle:vertical { background: #3a3a42; border-radius: 4px; min-height: 30px; margin: 2px; }

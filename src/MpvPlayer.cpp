@@ -102,17 +102,35 @@ void MpvPlayer::loadFile(const QString &path, double startAt)
     command(args);
 }
 
+namespace {
+
+// mpv wants a NULL-terminated char* array; the QByteArrays keep the strings alive.
+struct CommandArgs {
+    explicit CommandArgs(const QStringList &args)
+    {
+        utf8.reserve(args.size());
+        for (const QString &arg : args)
+            utf8.append(arg.toUtf8());
+        for (const QByteArray &arg : utf8)
+            argv.append(arg.constData());
+        argv.append(nullptr);
+    }
+    QList<QByteArray> utf8;
+    QVector<const char *> argv;
+};
+
+} // namespace
+
 void MpvPlayer::command(const QStringList &args)
 {
-    QList<QByteArray> utf8;
-    utf8.reserve(args.size());
-    for (const QString &arg : args)
-        utf8.append(arg.toUtf8());
-    QVector<const char *> argv;
-    for (const QByteArray &arg : utf8)
-        argv.append(arg.constData());
-    argv.append(nullptr);
-    mpv_command_async(m_mpv, 0, argv.data());
+    CommandArgs command(args);
+    mpv_command_async(m_mpv, 0, command.argv.data());
+}
+
+bool MpvPlayer::commandSync(const QStringList &args)
+{
+    CommandArgs command(args);
+    return mpv_command(m_mpv, command.argv.data()) >= 0;
 }
 
 void MpvPlayer::setPaused(bool paused)
@@ -145,6 +163,16 @@ QString MpvPlayer::propertyString(const char *name) const
     const QString result = value ? QString::fromUtf8(value) : QString();
     mpv_free(value);
     return result;
+}
+
+QVariant MpvPlayer::propertyValue(const char *name) const
+{
+    mpv_node node;
+    if (mpv_get_property(m_mpv, name, MPV_FORMAT_NODE, &node) < 0)
+        return {};
+    const QVariant value = nodeToVariant(&node);
+    mpv_free_node_contents(&node);
+    return value;
 }
 
 void MpvPlayer::setPropertyString(const char *name, const QString &value)

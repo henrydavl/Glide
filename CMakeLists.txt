@@ -26,6 +26,8 @@ qt_add_executable(Glide WIN32 MACOSX_BUNDLE
     src/main.cpp
     src/MainWindow.cpp src/MainWindow.h
     src/MpvPlayer.cpp src/MpvPlayer.h
+    src/AudioEngine.cpp src/AudioEngine.h
+    src/AudioDialog.cpp src/AudioDialog.h
     src/VideoView.cpp src/VideoView.h
     src/ControlBar.cpp src/ControlBar.h
     src/PlaylistPanel.cpp src/PlaylistPanel.h
@@ -38,7 +40,7 @@ qt_add_executable(Glide WIN32 MACOSX_BUNDLE
 target_link_libraries(Glide PRIVATE Qt6::Widgets Qt6::OpenGLWidgets Qt6::Network PkgConfig::MPV)
 
 # Window/taskbar icon at runtime. Regenerate all icon files with scripts/make-icon.py.
-qt_add_resources(Glide "icons" PREFIX "/" FILES assets/icon-256.png)
+qt_add_resources(Glide "icons" PREFIX "/" FILES assets/icon-256.png assets/check.png)
 
 if(WIN32)
     target_sources(Glide PRIVATE src/glide.rc)

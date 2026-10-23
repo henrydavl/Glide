@@ -1,5 +1,7 @@
 #include "MainWindow.h"
 
+#include "AudioDialog.h"
+#include "AudioEngine.h"
 #include "ControlBar.h"
 #include "DurationProber.h"
 #include "MediaFiles.h"
@@ -63,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_playlist(new PlaylistPanel(&m_store, this))
     , m_controls(new ControlBar(this))
     , m_prober(new DurationProber(this))
+    , m_audio(new AudioEngine(m_player, this))
 {
     setWindowTitle(QStringLiteral("Glide"));
     setAcceptDrops(true);
@@ -140,6 +143,7 @@ void MainWindow::configurePlayer()
     };
     for (const auto &[name, value] : options)
         m_player->setOption(name, value);
+    m_audio->configure();
 }
 
 void MainWindow::connectSignals()
@@ -301,6 +305,7 @@ void MainWindow::play(const QString &path)
     m_stopped = false;
 
     const double resume = m_store.resumePosition(path);
+    m_audio->syncFilters();
     m_player->loadFile(path, resume);
     m_player->setPaused(false);
     m_pendingOsd = resume > 0 ? tr("Resumed at %1").arg(formatTime(resume)) : QString();
@@ -486,7 +491,15 @@ bool MainWindow::handleKey(QKeyEvent *event)
         showQuickInfo();
         return true;
     case Qt::Key_A:
+        m_audio->syncFilters();
         m_player->command({"osd-msg", "cycle", "aid"});
+        return true;
+    case Qt::Key_E:
+        showAudioDialog(AudioDialog::EqualizerTab);
+        return true;
+    case Qt::Key_BracketLeft:
+    case Qt::Key_BracketRight:
+        m_player->command({"osd-msg", "add", "audio-delay", key == Qt::Key_BracketLeft ? "-0.05" : "0.05"});
         return true;
     case Qt::Key_S:
         if (ctrl)
@@ -628,9 +641,12 @@ void MainWindow::fillTrackMenu(QMenu *menu, const QString &type)
         action->setChecked(track.selected);
         anySelected |= track.selected;
         group->addAction(action);
-        const qint64 id = track.id;
-        connect(action, &QAction::triggered, this, [this, property, id] {
-            m_player->setPropertyString(property, QString::number(id));
+        const QString id = QString::number(track.id);
+        connect(action, &QAction::triggered, this, [this, subtitles, property, id] {
+            if (subtitles)
+                m_player->setPropertyString(property, id);
+            else
+                selectAudioTrack(id);
         });
         trackActions << action;
     }
@@ -646,9 +662,28 @@ void MainWindow::fillTrackMenu(QMenu *menu, const QString &type)
             menu->insertSeparator(trackActions.first());
         menu->addSeparator();
         menu->addAction(tr("Load subtitle file…"), this, &MainWindow::loadSubtitleDialog);
-    } else if (trackActions.isEmpty()) {
-        menu->addAction(tr("No audio tracks"))->setEnabled(false);
+    } else {
+        if (trackActions.isEmpty())
+            menu->addAction(tr("No audio tracks"))->setEnabled(false);
+        menu->addSeparator();
+        menu->addAction(tr("Equalizer…\tE"), this, [this] { showAudioDialog(AudioDialog::EqualizerTab); });
+        menu->addAction(tr("Decoders && passthrough…"), this, [this] { showAudioDialog(AudioDialog::DecodersTab); });
+        menu->addAction(tr("Output device && sync…"), this, [this] { showAudioDialog(AudioDialog::OutputTab); });
     }
+}
+
+void MainWindow::selectAudioTrack(const QString &id)
+{
+    // Switching tracks rebuilds the filter graph, so it must carry the latest EQ.
+    m_audio->syncFilters();
+    m_player->setPropertyString("aid", id);
+}
+
+void MainWindow::showAudioDialog(int tab)
+{
+    if (!m_audioDialog)
+        m_audioDialog = new AudioDialog(m_audio, this);
+    m_audioDialog->showTab(AudioDialog::Tab(tab));
 }
 
 void MainWindow::fillVideoMenu(QMenu *menu)
