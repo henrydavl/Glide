@@ -36,7 +36,9 @@ Right-click the video for track menus, deinterlace options and low-power renderi
 
 ## Getting the Windows build
 
-Every push to `main` builds a portable folder on GitHub Actions. Open the latest **Windows build** run and download the `Glide-windows-x64` artifact, unzip it anywhere and run `Glide.exe`. To make it your default player, right-click a `.ts` file → Open with → Choose another app → Glide.exe → Always.
+**[Download the latest Windows build](https://github.com/henrydavl/Glide/releases/latest/download/Glide-windows-x64.zip)**
+
+Every push to `main` builds Glide on GitHub Actions and publishes it as a new [release](https://github.com/henrydavl/Glide/releases) (`v0.1.<build number>`), so the link above always gives you the newest version. Unzip it anywhere and run `Glide.exe`; nothing needs installing. To update, replace the folder (your settings and resume points live in `%APPDATA%\Glide`). To make Glide your default player, right-click a `.ts` file → Open with → Choose another app → Glide.exe → Always.
 
 ### Building on Windows yourself
 

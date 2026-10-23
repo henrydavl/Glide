@@ -9,6 +9,19 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGLWidgets Network)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(MPV REQUIRED IMPORTED_TARGET mpv)
 
+# MSYS2's .pc files can list MSYS-style dirs such as /ucrt64/include that native CMake
+# can't resolve. The compiler already searches those, so keep only dirs that exist.
+get_target_property(MPV_INCLUDES PkgConfig::MPV INTERFACE_INCLUDE_DIRECTORIES)
+if(MPV_INCLUDES)
+    set(MPV_EXISTING_INCLUDES "")
+    foreach(dir IN LISTS MPV_INCLUDES)
+        if(EXISTS "${dir}")
+            list(APPEND MPV_EXISTING_INCLUDES "${dir}")
+        endif()
+    endforeach()
+    set_target_properties(PkgConfig::MPV PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${MPV_EXISTING_INCLUDES}")
+endif()
+
 qt_add_executable(Glide WIN32 MACOSX_BUNDLE
     src/main.cpp
     src/MainWindow.cpp src/MainWindow.h

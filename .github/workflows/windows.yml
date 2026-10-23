@@ -1,10 +1,20 @@
 name: Windows build
 
+# Every push to main builds Glide for Windows and publishes it as a GitHub release, so the
+# newest build is always at:
+# https://github.com/henrydavl/Glide/releases/latest/download/Glide-windows-x64.zip
 on:
   push:
     branches: [main]
   pull_request:
   workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   windows:
@@ -30,7 +40,22 @@ jobs:
       - name: Build and bundle
         run: ./scripts/build-windows.sh
 
+      - name: Zip
+        shell: pwsh
+        run: Compress-Archive -Path dist/Glide -DestinationPath Glide-windows-x64.zip
+
       - uses: actions/upload-artifact@v4
         with:
           name: Glide-windows-x64
-          path: dist/Glide
+          path: Glide-windows-x64.zip
+
+      - name: Publish release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v0.1.${{ github.run_number }}
+          name: Glide 0.1.${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          generate_release_notes: true
+          make_latest: true
+          files: Glide-windows-x64.zip
